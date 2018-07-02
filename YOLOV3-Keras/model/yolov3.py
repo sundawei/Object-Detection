@@ -17,10 +17,10 @@ class YOLO:
 
     def nms_boxes(self, boxes: np.ndarray, scores: np.ndarray) -> np.ndarray:
         '''
-
-        :param boxes:
-        :param scores:
-        :return:
+        使用非极大值抑制，计算剩余的box，返回值为原先列表的下标
+        :param boxes: [x, y, w, h] * nums
+        :param scores: score * nums
+        :return: the index
         '''
         x = boxes[:, 0]
         y = boxes[:, 1]
@@ -52,3 +52,25 @@ class YOLO:
 
         return keep
 
+    def filter_object_boxes(self, boxes: np.ndarray, box_confidences: np.ndarray, box_class_probs: np.ndarray):
+
+        box_scores = box_confidences * box_class_probs
+        # get the max score of all the classes -> return index
+        box_classes = np.argmax(box_scores, axis=-1)
+        box_class_scores = np.max(box_scores, axis=-1)
+        # filter
+        pos = np.where(box_scores >= self.t1)
+
+        boxes = boxes[pos]
+        box_scores = box_scores[pos]
+        box_class_scores = box_scores[pos]
+
+        return boxes, box_scores, box_class_scores
+
+    #
+    # def process_feature(self):
+    #
+    #
+    # def yolo_out(self):
+    #
+    # def predict(self):
